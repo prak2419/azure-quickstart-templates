@@ -639,8 +639,123 @@
                                         }
                                     }
                                 }
+                            },
+                        {
+                                "Id": "NumberTileListBuilderBlade",
+                                "Type": "Blade",
+                                "Version": 0,
+                                "Configuration": {
+                                    "General": {
+                                        "title": "Completed Jobs Summary",
+                                        "newGroup": false,
+                                        "icon": "",
+                                        "useIcon": false
+                                    },
+                                    "Tile": {
+                                        "Query": "AzureDiagnostics | where Category == \"AzureBackupReport\" and OperationName == \"Job\" and JobOperation_s == \"Backup\" and JobStatus_s == \"Completed\" and SchemaVersion_s == \"V2\" | summarize count() by JobUniqueId_g | count",
+                                        "Legend": "Total number of successful jobs",
+                                        "NavigationSelect": {}
+                                    },
+                                    "List": {
+                                        "Query": "let Events = AzureDiagnostics | where Category == \"AzureBackupReport\"; Events | extend JobOperationSubType_s = columnifexists(\"JobOperationSubType_s\", \"\") | where OperationName == \"Job\" and JobOperation_s == \"Backup\" and JobOperationSubType_s != \"Log\" and JobOperationSubType_s != \"Recovery point_Log\" and JobStatus_s == \"Completed\" and SchemaVersion_s == \"V1\" | distinct JobUniqueId_g, BackupItemUniqueId_s, JobStatus_s, Resource, JobStartDateTime_s | project BackupItemUniqueId_s, JobStatus_s, Resource | join kind=leftouter ( Events | where OperationName == \"BackupItem\" | distinct BackupItemUniqueId_s, BackupItemFriendlyName_s | project BackupItemUniqueId_s , BackupItemFriendlyName_s ) on BackupItemUniqueId_s | summarize TotalJobCount = count(JobStatus_s) by BackupItemFriendlyName_s, JobStatus_s | project BackupItemFriendlyName_s , TotalJobCount , JobStatus_s | order by TotalJobCount desc",
+                                        "HideGraph": false,
+                                        "enableSparklines": false,
+                                        "operation": "Summary",
+                                        "ColumnsTitle": {
+                                            "Name": "VM",
+                                            "Value": "Count"
+                                        },
+                                        "Color": "#0072c6",
+                                        "thresholds": {
+                                            "isEnabled": false,
+                                            "values": [
+                                                {
+                                                    "name": "Normal",
+                                                    "threshold": "Default",
+                                                    "color": "#009e49",
+                                                    "isDefault": true
+                                                },
+                                                {
+                                                    "name": "Warning",
+                                                    "threshold": "60",
+                                                    "color": "#fcd116",
+                                                    "isDefault": false
+                                                },
+                                                {
+                                                    "name": "Error",
+                                                    "threshold": "90",
+                                                    "color": "#ba141a",
+                                                    "isDefault": false
+                                                }
+                                            ]
+                                        },
+                                        "NameDSVSeparator": "",
+                                        "NavigationQuery": "search {selected item} | sort by TimeGenerated desc",
+                                        "NavigationSelect": {
+                                            "NavigationQuery": "search {selected item} | sort by TimeGenerated desc"
+                                        }
+                                    }
+                                }
+                            },
+                            {
+                                "Id": "NumberTileListBuilderBlade",
+                                "Type": "Blade",
+                                "Version": 0,
+                                "Configuration": {
+                                    "General": {
+                                        "title": "Failed Jobs Summary",
+                                        "newGroup": false,
+                                        "icon": "",
+                                        "useIcon": false
+                                    },
+                                    "Tile": {
+                                        "Query": "AzureDiagnostics | where Category == \"AzureBackupReport\" | extend JobOperationSubType_s = columnifexists(\"JobOperationSubType_s\", \"\") | where OperationName == \"Job\" and JobOperation_s == \"Backup\" and JobOperationSubType_s != \"Log\" and JobOperationSubType_s != \"Recovery point_Log\" and JobStatus_s == \"Failed\" | summarize count() by JobUniqueId_g | count",
+                                        "Legend": "Total number of failed jobs",
+                                        "NavigationSelect": {}
+                                    },
+                                    "List": {
+                                        "Query": "let Events = AzureDiagnostics | where Category == \"AzureBackupReport\"; Events | extend JobOperationSubType_s = columnifexists(\"JobOperationSubType_s\", \"\") | where OperationName == \"Job\" and JobOperation_s == \"Backup\" and JobOperationSubType_s != \"Log\" and JobOperationSubType_s != \"Recovery point_Log\" and JobStatus_s == \"Failed\" and SchemaVersion_s == \"V1\" | distinct JobUniqueId_g, BackupItemUniqueId_s, JobStatus_s, Resource, JobFailureCode_s | project BackupItemUniqueId_s, JobStatus_s, Resource, JobFailureCode_s | join kind=leftouter ( Events | where OperationName == \"BackupItem\" | distinct BackupItemUniqueId_s, BackupItemFriendlyName_s | project BackupItemUniqueId_s , BackupItemFriendlyName_s ) on BackupItemUniqueId_s | summarize TotalJobCount = count(JobStatus_s) by BackupItemFriendlyName_s, JobStatus_s, JobFailureCode_s | project BackupItemFriendlyName_s , TotalJobCount , JobFailureCode_s | order by TotalJobCount desc",
+                                        "HideGraph": false,
+                                        "enableSparklines": false,
+                                        "operation": "Summary",
+                                        "ColumnsTitle": {
+                                            "Name": "VM",
+                                            "Value": "Count"
+                                        },
+                                        "Color": "#dd5900",
+                                        "thresholds": {
+                                            "isEnabled": false,
+                                            "values": [
+                                                {
+                                                    "name": "Normal",
+                                                    "threshold": "Default",
+                                                    "color": "#009e49",
+                                                    "isDefault": true
+                                                },
+                                                {
+                                                    "name": "Warning",
+                                                    "threshold": "60",
+                                                    "color": "#fcd116",
+                                                    "isDefault": false
+                                                },
+                                                {
+                                                    "name": "Error",
+                                                    "threshold": "90",
+                                                    "color": "#ba141a",
+                                                    "isDefault": false
+                                                }
+                                            ]
+                                        },
+                                        "NameDSVSeparator": "",
+                                        "NavigationQuery": "search {selected item} | sort by TimeGenerated desc",
+                                        "NavigationSelect": {
+                                            "NavigationQuery": "search {selected item} | sort by TimeGenerated desc"
+                                        }
+                                    }
+                                }
                             }
                         ],
+                        "Filters": [],
                         "OverviewTile": {
                             "Id": "SingleQueryDonutBuilderTileV1",
                             "Type": "OverviewTile",
